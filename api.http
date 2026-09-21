@@ -1,0 +1,30 @@
+### List all rooms
+GET http://localhost:8080/api/rooms
+
+### Get room with id 1
+GET http://localhost:8080/api/room/1
+
+### Get non-existent room
+GET http://localhost:8080/api/room/1337
+
+### post with @requestbody
+POST http://localhost:8080/api/rooms
+Content-Type: application/json
+
+{
+    "name": "Outside",
+    "capacity": 999
+}
+
+### replace @requestbody
+PUT http://localhost:8080/api/rooms/2
+Content-Type: application/json
+
+{
+  "id": 2,
+  "name": "Home",
+  "capacity": 10
+}
+
+### Get bad request
+GET https://localhost:8080/api/rooms?minCapacity=9999
