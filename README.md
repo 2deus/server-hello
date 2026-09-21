@@ -29,7 +29,7 @@ This API is for creating, reading, updating, and deleting an array of rooms in t
 
 **OPTION 1**: From the project root (server-hello), in PowerShell or cmd:
 
-`.\gradlew.bat bootRun`
+```.\gradlew.bat bootRun```
 
 This downloads Gradle on first run, then starts server on port 8080. Ctrl+C enter y enter to stop
 
@@ -37,10 +37,10 @@ This downloads Gradle on first run, then starts server on port 8080. Ctrl+C ente
 
 Build the .jar:
 
-`.\gradlew.bat bootJar`
+```.\gradlew.bat bootJar```
 
 Run the .jar:
 
-`java -jar build\libs\server-hello-1.0.jar`
+```java -jar build\libs\server-hello-1.0.jar```
 
 *Note: version may change. Check build.gradle in build\libs (after running the first line)*
