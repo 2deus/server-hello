@@ -7,6 +7,12 @@ GET http://localhost:8080/api/rooms/1
 ### Get non-existent room
 GET http://localhost:8080/api/rooms/1337
 
+### Get rooms with minimum capacity of 40
+GET http://localhost:8080/api/rooms?minCapacity=40
+
+### Get rooms with minimum capacity of 999
+GET http://localhost:8080/api/rooms?minCapacity=999
+
 ### post with @requestbody
 POST http://localhost:8080/api/rooms
 Content-Type: application/json
@@ -25,6 +31,3 @@ Content-Type: application/json
   "name": "Home",
   "capacity": 10
 }
-
-### Get bad request
-GET https://localhost:8080/api/rooms?minCapacity=9999
