@@ -1,11 +1,11 @@
+### Get room name of room with id 1
+GET http://localhost:8080/api/1
+
+### Find first room matching keyword
+GET http://localhost:8080/api/search?keyword=s
+
 ### List all rooms
 GET http://localhost:8080/api/rooms
-
-### Get room with id 1
-GET http://localhost:8080/api/rooms/1
-
-### Get non-existent room
-GET http://localhost:8080/api/rooms/1337
 
 ### Get rooms with minimum capacity of 40
 GET http://localhost:8080/api/rooms?minCapacity=40
@@ -13,7 +13,16 @@ GET http://localhost:8080/api/rooms?minCapacity=40
 ### Get rooms with minimum capacity of 999
 GET http://localhost:8080/api/rooms?minCapacity=999
 
-### post with @requestbody
+### Find all rooms matching keyword
+GET http://localhost:8080/api/rooms?keyword=s
+
+### Get room with id 1
+GET http://localhost:8080/api/rooms/1
+
+### Get non-existent room
+GET http://localhost:8080/api/rooms/1337
+
+### Append new room record to end
 POST http://localhost:8080/api/rooms
 Content-Type: application/json
 
@@ -22,12 +31,44 @@ Content-Type: application/json
     "capacity": 999
 }
 
-### replace @requestbody
+### Create a new room at id 99
+POST http://localhost:8080/api/rooms/99
+Content-Type: application/json
+
+{
+  "name": "Fountain",
+  "capacity": 6
+}
+
+### Create a room where a room already exists
+POST http://localhost:8080/api/rooms/1
+Content-Type: application/json
+
+{
+  "name": "Void",
+  "capacity": 0
+}
+
+### replace a room record
 PUT http://localhost:8080/api/rooms/2
 Content-Type: application/json
 
 {
-  "id": 2,
   "name": "Home",
   "capacity": 10
 }
+
+### Replace a non-existent room record
+PUT http://localhost:8080/api/rooms/1337
+Content-Type: application/json
+
+{
+  "name": "A distant dream",
+  "capacity": 1337
+}
+
+### delete entry
+DELETE http://localhost:8080/api/rooms/2
+
+### delete non-existent entry
+DELETE http://localhost:8080/api/rooms/1337

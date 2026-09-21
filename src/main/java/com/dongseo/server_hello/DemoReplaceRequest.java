@@ -1,4 +1,4 @@
 package com.dongseo.server_hello;
 
-public record DemoReplaceRequest(Long id, String name, int capacity) {
+public record DemoReplaceRequest(String name, int capacity) {
 }
