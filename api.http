@@ -2,10 +2,10 @@
 GET http://localhost:8080/api/rooms
 
 ### Get room with id 1
-GET http://localhost:8080/api/room/1
+GET http://localhost:8080/api/rooms/1
 
 ### Get non-existent room
-GET http://localhost:8080/api/room/1337
+GET http://localhost:8080/api/rooms/1337
 
 ### post with @requestbody
 POST http://localhost:8080/api/rooms
