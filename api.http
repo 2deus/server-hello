@@ -28,7 +28,7 @@ Content-Type: application/json
 
 {
     "name": "Outside",
-    "capacity": 999
+    "capacity": 20
 }
 
 ### replace a room record
