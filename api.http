@@ -31,24 +31,6 @@ Content-Type: application/json
     "capacity": 999
 }
 
-### Create a new room at id 99
-POST http://localhost:8080/api/rooms/99
-Content-Type: application/json
-
-{
-  "name": "Fountain",
-  "capacity": 6
-}
-
-### Create a room where a room already exists
-POST http://localhost:8080/api/rooms/1
-Content-Type: application/json
-
-{
-  "name": "Void",
-  "capacity": 0
-}
-
 ### replace a room record
 PUT http://localhost:8080/api/rooms/2
 Content-Type: application/json
