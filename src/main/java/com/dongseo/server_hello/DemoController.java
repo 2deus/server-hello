@@ -49,13 +49,13 @@ public class DemoController {
 
     @PostMapping("/rooms")
     public ResponseEntity<Demo> create(@RequestBody DemoCreateRequest request) {
-        Demo result = demoService.createDemo(request);
+        Demo result = demoService.createDemo(request.name(), request.capacity());
         return ResponseEntity.created(URI.create("/api/rooms/" + result.id())).body(result);
     }
 
     @PutMapping("/rooms/{id}")
     public ResponseEntity<Demo> replace(@PathVariable Long id, @RequestBody DemoCreateRequest request) {
-        return demoService.updateDemo(id, request)
+        return demoService.updateDemo(id, request.name(), request.capacity())
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id));
     }

@@ -34,15 +34,15 @@ public class DemoService {
         return demoRepository.findById(id);
     }
 
-    public Demo createDemo(DemoCreateRequest request) {
-        checkCapacity(request.capacity());
-        Demo entry = new Demo(null, request.name(), request.capacity());
+    public Demo createDemo(String name, Integer capacity) {
+        checkCapacity(capacity);
+        Demo entry = new Demo(null, name, capacity);
         return demoRepository.save(entry).orElseThrow();
     }
 
-    public Optional<Demo> updateDemo(Long id, DemoCreateRequest request) {
-        checkCapacity(request.capacity());
-        Demo entry = new Demo(id, request.name(), request.capacity());
+    public Optional<Demo> updateDemo(Long id, String name, Integer capacity) {
+        checkCapacity(capacity);
+        Demo entry = new Demo(id, name, capacity);
         return demoRepository.update(entry);
     }
 
