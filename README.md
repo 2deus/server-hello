@@ -41,6 +41,6 @@ Build the .jar:
 
 Run the .jar:
 
-```java -jar build\libs\server-hello-1.0.jar```
+```java -jar build\libs\server-hello-1.1.jar```
 
 *Note: version may change. Check build.gradle in build\libs (after running the first line)*
