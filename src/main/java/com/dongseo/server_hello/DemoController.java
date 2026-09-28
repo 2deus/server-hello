@@ -42,7 +42,7 @@ public class DemoController {
 
     @GetMapping("/rooms/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Demo getDemoByID(@PathVariable Long id) {
+    public Demo getDemoById(@PathVariable Long id) {
         return demoService.getDemoFromId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id));
     }
