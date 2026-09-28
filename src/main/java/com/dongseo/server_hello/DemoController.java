@@ -6,39 +6,35 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/api")
 public class DemoController {
 
-    private final InMemoryRoomRepository roomRepository;
+    private final DemoService demoService;
 
-    public DemoController(InMemoryRoomRepository roomRepository) {
-        this.roomRepository = roomRepository;
+    public DemoController(DemoService demoService) {
+        this.demoService = demoService;
     }
 
     @GetMapping("/{id}")
-    public String findOneRoom(@PathVariable Long id) {
-        return roomRepository.findById(id)
-                .map(Demo::name)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id));
+    public String findOneDemo(@PathVariable Long id) {
+        String result = demoService.getNameFromId(id);
+
+        if (result == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found with id " + id);
+        return result;
     }
 
     @GetMapping("/search")
     public Demo search(@RequestParam(defaultValue = "") String keyword) {
-        return roomRepository.findAll().stream()
-                .filter(room -> room.name().toLowerCase().contains(keyword.toLowerCase()))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found matching keyword " + keyword));
+        return demoService.searchOne(keyword)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + keyword));
     }
 
     @GetMapping("/rooms")
-    public List<Demo> all(@RequestParam(defaultValue = "0") int minCapacity, @RequestParam(defaultValue = "") String keyword) {
-        List<Demo> result = roomRepository.findAll().stream()
-                .filter(r -> r.capacity() >= minCapacity)
-                .filter(r -> r.name().toLowerCase().contains(keyword.toLowerCase()))
-                .toList();
+    public Collection<Demo> all(@RequestParam(defaultValue = "0") int minCapacity, @RequestParam(defaultValue = "") String keyword) {
+        Collection<Demo> result = demoService.searchAll(minCapacity, keyword);
 
         if (result.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No rooms found matching query");
         return result;
@@ -46,37 +42,27 @@ public class DemoController {
 
     @GetMapping("/rooms/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Demo getRoomByID(@PathVariable Long id) {
-        return roomRepository.findById(id)
+    public Demo getDemoByID(@PathVariable Long id) {
+        return demoService.getDemoFromId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id));
     }
 
     @PostMapping("/rooms")
     public ResponseEntity<Demo> create(@RequestBody DemoCreateRequest request) {
-        Demo entry = new Demo(null, request.name(), request.capacity());
-        Demo created = roomRepository.save(entry).orElseThrow();
-        return ResponseEntity.created(URI.create("/api/rooms/" + created.id())).body(created);
-    }
-
-    @PostMapping("/rooms/{id}")
-    public ResponseEntity<Demo> createAtId(@PathVariable Long id, @RequestBody DemoCreateRequest request) {
-        Demo entry = new Demo(id, request.name(), request.capacity());
-        return roomRepository.save(entry)
-                .map(created -> ResponseEntity.created(URI.create("/api/rooms/" + id)).body(created))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "Room already exists at " + id));
+        Demo result = demoService.createDemo(request);
+        return ResponseEntity.created(URI.create("/api/rooms/" + result.id())).body(result);
     }
 
     @PutMapping("/rooms/{id}")
-    public ResponseEntity<Demo> replace(@PathVariable Long id, @RequestBody DemoReplaceRequest request) {
-        Demo entry = new Demo(id, request.name(), request.capacity());
-        return roomRepository.update(entry)
+    public ResponseEntity<Demo> replace(@PathVariable Long id, @RequestBody DemoCreateRequest request) {
+        return demoService.updateDemo(id, request)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id));
     }
 
     @DeleteMapping("/rooms/{id}")
     public ResponseEntity<Demo> delete(@PathVariable long id) {
-        if (!roomRepository.deleteById(id))
+        if (!demoService.deleteDemo(id))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id);
         return ResponseEntity.noContent().build();
     }
