@@ -1,16 +1,14 @@
 package com.dongseo.server_hello.Repository;
 
 import com.dongseo.server_hello.Demo;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class InMemoryDemoRepository {
+public class DemoRepository {
     private final Map<Long, Demo> demos = new ConcurrentHashMap<>(Map.of(
             1L, new Demo(1L, "Seminar A", 8),
             2L, new Demo(2L, "Study Pod", 4),

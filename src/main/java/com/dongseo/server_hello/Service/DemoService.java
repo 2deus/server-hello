@@ -1,7 +1,7 @@
 package com.dongseo.server_hello.Service;
 
 import com.dongseo.server_hello.Demo;
-import com.dongseo.server_hello.Repository.InMemoryDemoRepository;
+import com.dongseo.server_hello.Repository.DemoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -9,8 +9,8 @@ import java.util.Optional;
 
 @Service
 public class DemoService {
-    private final InMemoryDemoRepository demoRepository;
-    public DemoService(InMemoryDemoRepository demoRepository) { this.demoRepository = demoRepository; }
+    private final DemoRepository demoRepository;
+    public DemoService(DemoRepository demoRepository) { this.demoRepository = demoRepository; }
 
     public Collection<Demo> searchAll(Integer minCapacity, String keyword) {
         return demoRepository.findAll().stream()
