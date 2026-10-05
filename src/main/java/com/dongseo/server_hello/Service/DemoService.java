@@ -1,8 +1,8 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.Service;
 
-import org.springframework.http.HttpStatus;
+import com.dongseo.server_hello.Demo;
+import com.dongseo.server_hello.Repository.InMemoryDemoRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -55,6 +55,7 @@ public class DemoService {
         int minCapacity = 1;
         int maxCapacity = 20;
         if (capacity < minCapacity || capacity > maxCapacity)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Capacity " + capacity + " out of bounds (must be between " + minCapacity + " and " + maxCapacity + ")");
+            throw new IllegalArgumentException("Capacity must be between " + minCapacity + "and " + maxCapacity);
+            //throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Capacity " + capacity + " out of bounds (must be between " + minCapacity + " and " + maxCapacity + ")");
     }
 }

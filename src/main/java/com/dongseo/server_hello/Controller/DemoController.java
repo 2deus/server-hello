@@ -1,5 +1,8 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.Controller;
 
+import com.dongseo.server_hello.Demo;
+import com.dongseo.server_hello.DemoCreateRequest;
+import com.dongseo.server_hello.Service.DemoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,15 +52,24 @@ public class DemoController {
 
     @PostMapping("/rooms")
     public ResponseEntity<Demo> create(@RequestBody DemoCreateRequest request) {
-        Demo result = demoService.createDemo(request.name(), request.capacity());
+        Demo result;
+        try {
+            result = demoService.createDemo(request.name(), request.capacity());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
         return ResponseEntity.created(URI.create("/api/rooms/" + result.id())).body(result);
     }
 
     @PutMapping("/rooms/{id}")
     public ResponseEntity<Demo> replace(@PathVariable Long id, @RequestBody DemoCreateRequest request) {
-        return demoService.updateDemo(id, request.name(), request.capacity())
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id));
+        try {
+            return demoService.updateDemo(id, request.name(), request.capacity())
+                    .map(ResponseEntity::ok)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @DeleteMapping("/rooms/{id}")

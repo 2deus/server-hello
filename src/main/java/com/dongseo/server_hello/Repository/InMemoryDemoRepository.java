@@ -1,5 +1,6 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.Repository;
 
+import com.dongseo.server_hello.Demo;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
