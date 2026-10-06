@@ -4,7 +4,7 @@ import com.dongseo.server_hello.Demo;
 import com.dongseo.server_hello.Repository.DemoRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -12,17 +12,12 @@ public class DemoService {
     private final DemoRepository demoRepository;
     public DemoService(DemoRepository demoRepository) { this.demoRepository = demoRepository; }
 
-    public Collection<Demo> search(Integer minCapacity, String keyword) {
-        return demoRepository.findAll().stream()
-                .filter(d -> d.getCapacity() >= minCapacity)
-                .filter(d -> d.getName().toLowerCase().contains(keyword.toLowerCase()))
-                .toList();
+    public List<Demo> search(Integer minCapacity, String keyword) {
+        return demoRepository.findByCapacityGreaterThanEqualAndNameContainingIgnoreCase(minCapacity, keyword);
     }
 
-    public Optional<Demo> searchOne(String keyword) {
-        return demoRepository.findAll().stream()
-                .filter(d -> d.getName().toLowerCase().contains(keyword.toLowerCase()))
-                .findFirst();
+    public List<Demo> searchByName(String keyword) {
+        return demoRepository.findByNameContainingIgnoreCase(keyword);
     }
 
     public String getNameFromId(Long id) {

@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -30,9 +31,11 @@ public class DemoController {
     }
 
     @GetMapping("/search")
-    public Demo search(@RequestParam(defaultValue = "") String keyword) {
-        return demoService.searchOne(keyword)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + keyword));
+    public List<Demo> search(@RequestParam(defaultValue = "") String keyword) {
+        List<Demo> result = demoService.searchByName(keyword);
+
+        if (result.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found with name " + keyword);
+        return result;
     }
 
     @GetMapping("/rooms")

@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS demo;
 DROP TABLE IF EXISTS reservation;
+DROP TABLE IF EXISTS demo;
 
 CREATE TABLE demo (
     id              BIGINT          AUTO_INCREMENT PRIMARY KEY,
