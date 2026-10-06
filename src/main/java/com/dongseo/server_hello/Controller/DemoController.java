@@ -37,7 +37,7 @@ public class DemoController {
 
     @GetMapping("/rooms")
     public Collection<Demo> all(@RequestParam(defaultValue = "0") int minCapacity, @RequestParam(defaultValue = "") String keyword) {
-        Collection<Demo> result = demoService.searchAll(minCapacity, keyword);
+        Collection<Demo> result = demoService.search(minCapacity, keyword);
 
         if (result.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No rooms found matching query");
         return result;
@@ -58,7 +58,7 @@ public class DemoController {
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-        return ResponseEntity.created(URI.create("/api/rooms/" + result.id())).body(result);
+        return ResponseEntity.created(URI.create("/api/rooms/" + result.getId())).body(result);
     }
 
     @PutMapping("/rooms/{id}")
@@ -74,7 +74,7 @@ public class DemoController {
 
     @DeleteMapping("/rooms/{id}")
     public ResponseEntity<Demo> delete(@PathVariable long id) {
-        if (!demoService.deleteDemo(id))
+        if (!demoService.delete(id))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No room found at " + id);
         return ResponseEntity.noContent().build();
     }
