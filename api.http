@@ -1,20 +1,8 @@
 ### Get room name of room with id 1
 GET http://localhost:8080/api/1
 
-### Find first room matching keyword
-GET http://localhost:8080/api/search?keyword=s
-
 ### List all rooms
 GET http://localhost:8080/api/rooms
-
-### Get rooms with minimum capacity of 40
-GET http://localhost:8080/api/rooms?minCapacity=40
-
-### Get rooms with minimum capacity of 999
-GET http://localhost:8080/api/rooms?minCapacity=999
-
-### Find all rooms matching keyword
-GET http://localhost:8080/api/rooms?keyword=s
 
 ### Get room with id 1
 GET http://localhost:8080/api/rooms/1
@@ -22,12 +10,24 @@ GET http://localhost:8080/api/rooms/1
 ### Get non-existent room
 GET http://localhost:8080/api/rooms/1337
 
+### Get rooms with minimum capacity of 10
+GET http://localhost:8080/api/rooms?minCapacity=10
+
+### Get rooms with minimum capacity of 999
+GET http://localhost:8080/api/rooms?minCapacity=999
+
+### Find all rooms matching keyword
+GET http://localhost:8080/api/rooms?keyword=s
+
+### Print number of rooms with min capacity of 10
+GET http://localhost:8080/api/rooms/count?minCapacity=10
+
 ### Append new room record to end
 POST http://localhost:8080/api/rooms
 Content-Type: application/json
 
 {
-    "name": "Outside",
+    "name": "Inside",
     "capacity": 20
 }
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 {
   "name": "The World",
-  "capacity":  8319206987
+  "capacity":  2147483647
 }
 
 ### replace a room record
@@ -45,8 +45,8 @@ PUT http://localhost:8080/api/rooms/2
 Content-Type: application/json
 
 {
-  "name": "Home",
-  "capacity": 10
+  "name": "Closets",
+  "capacity": 3
 }
 
 ### Replace a non-existent room record
@@ -68,6 +68,9 @@ Content-Type: application/json
 }
 
 ### delete entry
+DELETE http://localhost:8080/api/rooms/3
+
+### delete entry which has reservations
 DELETE http://localhost:8080/api/rooms/2
 
 ### delete non-existent entry

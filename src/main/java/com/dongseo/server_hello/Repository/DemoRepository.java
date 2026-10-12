@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface DemoRepository
     extends JpaRepository<Demo, Long> {
-        List<Demo> findByNameContainingIgnoreCase(String keyword);
-
         List<Demo> findByCapacityGreaterThanEqualAndNameContainingIgnoreCase(int capacity, String name);
+        long countByCapacityGreaterThanEqual(int capacity);
 }

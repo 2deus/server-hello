@@ -16,9 +16,7 @@ public class DemoService {
         return demoRepository.findByCapacityGreaterThanEqualAndNameContainingIgnoreCase(minCapacity, keyword);
     }
 
-    public List<Demo> searchByName(String keyword) {
-        return demoRepository.findByNameContainingIgnoreCase(keyword);
-    }
+    public long count(int capacity) { return demoRepository.countByCapacityGreaterThanEqual(capacity); }
 
     public String getNameFromId(Long id) {
         return demoRepository.findById(id).map(Demo::getName).orElse(null);
@@ -35,9 +33,8 @@ public class DemoService {
     }
 
     public Optional<Demo> updateDemo(Long id, String name, Integer capacity) {
-        if (!demoRepository.existsById(id)) return Optional.empty();
-        Demo entry = new Demo(id, name, capacity);
-        return Optional.of(demoRepository.save(entry));
+        return demoRepository.findById(id)
+                .map(existing -> demoRepository.save(new Demo(id, name, capacity)));
     }
 
     // Wrapper

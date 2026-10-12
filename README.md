@@ -11,24 +11,25 @@ Claude Opus 5.5 was used for Java questions and consulting. Code is written by h
 | Method | Path                       | Status                            | Purpose                                                                |
 |--------|----------------------------|-----------------------------------|------------------------------------------------------------------------|
 | GET    | /api/{id}                  | HTTP/1.1 200 OK                   | Get room name of room at id                                            |
-| GET    | /api/search?keyword=STRING | HTTP/1.1 200 OK                   | Get first room matching keyword in name                                |
 | GET    | /api/rooms                 | HTTP/1.1 200 OK                   | List all rooms                                                         |
 | GET    | /api/rooms/{id}            | HTTP/1.1 200 OK                   | Get room at id                                                         |
-| GET    | /api/rooms/1337            | HTTP/1.1 404 NOT FOUND            | Get room at id 1337 (non-existent) for testing                         |
-| GET    | /api/rooms?minCapacity=40  | HTTP/1.1 200 OK                   | List all rooms with minimum capacity of 40                             |
-| GET    | /api/rooms?minCapacity=999 | HTTP/1.1 404 NOT FOUND            | List all rooms with minimum capacity of 999 (non-existent) for testing |
+| GET    | /api/rooms/1337            | HTTP/1.1 404 NOT FOUND            | Get room at id 1337 (non-existent)                                     |
+| GET    | /api/rooms?minCapacity=10  | HTTP/1.1 200 OK                   | List all rooms with minimum capacity of 10                             |
+| GET    | /api/rooms?minCapacity=999 | HTTP/1.1 404 NOT FOUND            | List all rooms with minimum capacity of 999 (non-existent)             |
 | GET    | /api/rooms?keyword=s       | HTTP/1.1 200 OK                   | Get all rooms matching keyword in name                                 |
+| GET    | /api/rooms/count           | HTTP/1.1 200 OK                   | Print the number of rooms with capacity over 10                        |
 | POST   | /api/rooms                 | HTTP/1.1 201 CREATED / ...headers | Create a room and append to end of list                                |
 | POST   | /api/rooms                 | HTTP/1.1 400 BAD REQUEST          | Create a room with out of bounds capacity                              |
 | PUT    | /api/rooms/2               | HTTP/1.1 200 OK                   | Replace room at id 2                                                   |
-| PUT    | /api/rooms/1337            | HTTP/1.1 404 NOT FOUND            | Replace a room at id 1337 (non-existent) for testing                   |
+| PUT    | /api/rooms/1337            | HTTP/1.1 404 NOT FOUND            | Replace a room at id 1337 (non-existent)                               |
 | PUT    | /api/rooms/2               | HTTP/1.1 400 BAD REQUEST          | Replace room at id 2 with one whose capacity is out of bounds          |
-| DELETE | /api/2                     | HTTP/1.1 204 NO CONTENT           | Delete room at id 2                                                    |
-| DELETE | /api/{id}                  | HTTP/1.1 404 NOT FOUND            | Delete room at id 1337 (non-existent) for testing                      |
+| DELETE | /api/rooms/3               | HTTP/1.1 204 EMPTY                | Delete a room at id 3                                                  |
+| DELETE | /api/2                     | HTTP/1.1 409 CONFLICT             | Delete a room at id 2, which has reservations                          |
+| DELETE | /api/{id}                  | HTTP/1.1 404 NOT FOUND            | Delete room at id 1337 (non-existent)                                  |
 
 ## Database
 
-This app uses an [in-memory H2 database](https://h2database.com/html/main.html).
+This project uses [MySQL](https://www.mysql.com/) to store surviving data.
 
 `schema.sql` creates the tables while `data.sql` fills them with data each start:
 
@@ -58,27 +59,52 @@ This app uses an [in-memory H2 database](https://h2database.com/html/main.html).
 
 One reservation can only belong to one room (1:N)
 
-## H2 Console
+## Setting up MySQL
 
-Run the project, then open the console in a browser:
+---
+Before running the project, you must set up the database.
 
-| Setting      | Value                                  |
-|--------------|----------------------------------------|
-| Console URL  | http://127.0.0.1:8080/h2-console       |
-| JDBC URL     | `jdbc:h2:mem:demodb`                   |
-| User Name    | `sa`                                   |
-| Password     | (empty)                                |
+After having logged in as root:
+1. Create the database:
+```mysql
+CREATE DATABASE demodb;
+```
+2. Create the user (exactly as defined in application.properties):
+```mysql
+CREATE USER 'demoapp'@'localhost' IDENTIFIED BY 'demoapp1234';
+```
+3. Grant all privileges to this database for that user:
+```mysql
+GRANT ALL PRIVILEGES ON demodb.* TO 'demoapp'@'localhost';
+FLUSH PRIVILEGES;
+```
+4. Run `reset.sql`:
+```mysql
+source /path/to/root/of/project/reset.sql
+```
 
-*NOTE: The JDBC URL must match `spring.datasource.url` in `application.properties`*
+The web layer returns 409 through `DemoExceptionHandler`, because HTTP status codes belong here, so the handler only translates exceptions thrown by the database.
 
-Example queries are in `queries.sql`
+Hibernate:
+```mysql
+select d1_0.id, d1_0.capacity, d1_0.name
+    from demo d1_0
+    where d1_0.id=?;
+    
+update demo
+    set capacity=?, name=?
+    where id=?
+```
 
-Claude Sonnet 5.5 was used for a refresher on SQL statements. Queries written by hand
+The select loads the existing room by id (findById), and the update then writes the new name and capacity back because they differ from the loaded row (save).
+
+*NOTE: Claude Sonnet 5.5 helped me come up with the idea of `DemoExceptionHandler.java` and guided me through realizing it.*
 
 ## Dependencies
 
 ---
 - [Java Development Kit 21](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+- [MySQL 8.4.11](https://dev.mysql.com/downloads/mysql/8.4.html)
 
 ## How to run
 
