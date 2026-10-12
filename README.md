@@ -31,7 +31,7 @@ Claude Opus 5.5 was used for Java questions and consulting. Code is written by h
 
 This project uses [MySQL](https://www.mysql.com/) to store surviving data.
 
-`schema.sql` creates the tables while `data.sql` fills them with data each start:
+`reset.sql` builds the two tables and fills them with data.
 
 ### Table `demo`
 
