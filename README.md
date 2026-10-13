@@ -80,7 +80,8 @@ FLUSH PRIVILEGES;
 ```
 4. Run `reset.sql`:
 ```mysql
-source /path/to/root/of/project/reset.sql
+use demodb;
+source /path/to/root/of/project/reset.sql;
 ```
 
 The web layer returns 409 through `DemoExceptionHandler`, because HTTP status codes belong here, so the handler only translates exceptions thrown by the database.
