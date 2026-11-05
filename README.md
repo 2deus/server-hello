@@ -41,21 +41,21 @@ This project uses [MySQL](https://www.mysql.com/) to store surviving data.
 | `name`     | VARCHAR(100) | NOT NULL                         |
 | `capacity` | INT          | NOT NULL, CHECK between 1 and 20 |
 
-### Table `reservation`
+### Table `appointment`
 
-| Column        | Type        | Constraints                         |
-|---------------|-------------|-------------------------------------|
-| `id`          | BIGINT      | Primary key, auto-generated         |
-| `demo_id`     | BIGINT      | NOT NULL, foreign key to `demo(id)` |
-| `reserved_by` | VARCHAR(50) | NOT NULL                            |
-| `start_time`  | TIMESTAMP   | NOT NULL                            |
-| `end_time`    | TIMESTAMP   | NOT NULL                            |
+| Column         | Type        | Constraints                         |
+|----------------|-------------|-------------------------------------|
+| `id`           | BIGINT      | Primary key, auto-generated         |
+| `demo_id`      | BIGINT      | NOT NULL, foreign key to `demo(id)` |
+| `appointed_by` | VARCHAR(50) | NOT NULL                            |
+| `start_time`   | TIMESTAMP   | NOT NULL                            |
+| `end_time`     | TIMESTAMP   | NOT NULL                            |
 
 ### Relationship
 
 | Parent table | Child table   | Join column                       | Cardinality                            |
 |--------------|---------------|-----------------------------------|----------------------------------------|
-| `demo`       | `reservation` | `reservation.demo_id` = `demo.id` | One room has many reservations (1 : N) |
+| `demo`       | `appointment` | `appointment.demo_id` = `demo.id` | One room has many appointments (1 : N) |
 
 One reservation can only belong to one room (1:N)
 

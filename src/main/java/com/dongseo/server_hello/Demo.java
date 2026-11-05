@@ -23,5 +23,5 @@ public class Demo {
 
     public Long     getId()         { return id; }
     public String   getName()       { return name; }
-    public int      getCapacity()   { return capacity; }
+    public int getCapacity()      { return capacity; }
 }
