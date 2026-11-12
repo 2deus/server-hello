@@ -99,7 +99,7 @@ update demo
 
 The select loads the existing room by id (findById), and the update then writes the new name and capacity back because they differ from the loaded row (save).
 
-*NOTE: Claude Sonnet 5.5 helped me come up with the idea of `DemoExceptionHandler.java` and guided me through realizing it.*
+*NOTE: Claude Sonnet 5.5 helped me come up with the idea of `ApiExceptionHandler.java` and guided me through realizing it.*
 
 ## Dependencies
 

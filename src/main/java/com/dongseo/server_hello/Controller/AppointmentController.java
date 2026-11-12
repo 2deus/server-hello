@@ -1,11 +1,9 @@
 package com.dongseo.server_hello.Controller;
 
-import com.dongseo.server_hello.Appointment;
 import com.dongseo.server_hello.AppointmentCreateRequest;
 import com.dongseo.server_hello.AppointmentResponse;
-import com.dongseo.server_hello.Exceptions.ConflictException;
+import com.dongseo.server_hello.Exception.ConflictException;
 import com.dongseo.server_hello.Service.AppointmentService;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +50,9 @@ public class AppointmentController {
         }
     }
 
+    @GetMapping("/rooms/{demoId}/reservations")
     public ResponseEntity<List<AppointmentResponse>> search(@RequestParam String appointedBy) {
-        return appointmentService.findByAppointedBy(appointedBy)
+        return appointmentService.findUsingAppointedBy(appointedBy)
                 .map(
                         list -> ResponseEntity.ok(
                             list.stream().map(AppointmentResponse::from)

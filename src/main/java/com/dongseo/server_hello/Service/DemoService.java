@@ -1,11 +1,12 @@
 package com.dongseo.server_hello.Service;
 
 import com.dongseo.server_hello.Demo;
+import com.dongseo.server_hello.Exception.NotFoundException;
 import com.dongseo.server_hello.Repository.DemoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DemoService {
@@ -13,34 +14,41 @@ public class DemoService {
     public DemoService(DemoRepository demoRepository) { this.demoRepository = demoRepository; }
 
     public List<Demo> search(Integer minCapacity, String keyword) {
-        return demoRepository.findByCapacityGreaterThanEqualAndNameContainingIgnoreCase(minCapacity, keyword);
+        List<Demo> result = demoRepository.findByCapacityGreaterThanEqualAndNameContainingIgnoreCase(minCapacity, keyword);
+
+        if (result.isEmpty()) {throw new NotFoundException("No rooms found matching query");}
+        return result;
     }
 
     public long count(int capacity) { return demoRepository.countByCapacityGreaterThanEqual(capacity); }
 
     public String getNameFromId(Long id) {
-        return demoRepository.findById(id).map(Demo::getName).orElse(null);
+        return demoRepository.findById(id).map(Demo::getName)
+                .orElseThrow(() -> new NotFoundException("room " + id + " not found"));
     }
 
     // Wrapper
-    public Optional<Demo> getDemoFromId(Long id) {
-        return demoRepository.findById(id);
+    public Demo getDemoFromId(Long id) {
+        return demoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("room " + id + " not found"));
     }
 
+    @Transactional
     public Demo createDemo(String name, Integer capacity) {
         Demo entry = new Demo(null, name, capacity);
         return demoRepository.save(entry);
     }
 
-    public Optional<Demo> updateDemo(Long id, String name, Integer capacity) {
-        return demoRepository.findById(id)
-                .map(existing -> demoRepository.save(new Demo(id, name, capacity)));
+    @Transactional
+    public Demo updateDemo(Long id, String name, int capacity) {
+        Demo demo = demoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("room " + id + " not found"));
+        demo.update(name, capacity);
+        return demo;
     }
 
-    // Wrapper
-    public boolean delete(Long id) {
-        if (!demoRepository.existsById(id)) return false;
+    public void delete(Long id) {
+        if (!demoRepository.existsById(id)) throw new NotFoundException("room " + id + " not found");
         demoRepository.deleteById(id);
-        return true;
     }
 }

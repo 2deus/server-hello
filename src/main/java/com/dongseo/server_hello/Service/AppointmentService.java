@@ -2,7 +2,7 @@ package com.dongseo.server_hello.Service;
 
 import com.dongseo.server_hello.Appointment;
 import com.dongseo.server_hello.Demo;
-import com.dongseo.server_hello.Exceptions.ConflictException;
+import com.dongseo.server_hello.Exception.ConflictException;
 import com.dongseo.server_hello.Repository.AppointmentRepository;
 import com.dongseo.server_hello.Repository.DemoRepository;
 import jakarta.transaction.Transactional;
@@ -27,8 +27,8 @@ public class AppointmentService {
         return Optional.of(appointmentRepository.findByDemoIdOrderByStartTime(demoId));
     }
 
-    public Optional<List<Appointment>> findByAppointedBy(String name) {
-        return Optional.of(appointmentRepository.findByAppointedByOrderByStartTime(name));
+    public List<Appointment> findUsingAppointedBy(String name) {
+        return appointmentRepository.findByAppointedByOrderByStartTime(name);
     }
 
     public List<Appointment> findByReservedBy(String name) {
