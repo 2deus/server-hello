@@ -1,4 +1,4 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.demo;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

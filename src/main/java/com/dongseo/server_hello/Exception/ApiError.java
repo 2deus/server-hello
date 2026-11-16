@@ -1,4 +1,4 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.Exception;
 
 import org.springframework.http.HttpStatus;
 

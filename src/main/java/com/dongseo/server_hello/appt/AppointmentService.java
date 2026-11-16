@@ -1,11 +1,9 @@
-package com.dongseo.server_hello.Service;
+package com.dongseo.server_hello.appt;
 
-import com.dongseo.server_hello.Appointment;
-import com.dongseo.server_hello.Demo;
+import com.dongseo.server_hello.demo.Demo;
 import com.dongseo.server_hello.Exception.ConflictException;
 import com.dongseo.server_hello.Exception.NotFoundException;
-import com.dongseo.server_hello.Repository.AppointmentRepository;
-import com.dongseo.server_hello.Repository.DemoRepository;
+import com.dongseo.server_hello.demo.DemoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

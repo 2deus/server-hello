@@ -1,6 +1,4 @@
-package com.dongseo.server_hello;
-
-import org.springframework.web.bind.annotation.GetMapping;
+package com.dongseo.server_hello.demo;
 
 public record DemoResponse(Long id, String name, int capacity) {
     public static DemoResponse from(Demo d) {

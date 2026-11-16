@@ -1,7 +1,5 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.Exception;
 
-import com.dongseo.server_hello.Exception.ConflictException;
-import com.dongseo.server_hello.Exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

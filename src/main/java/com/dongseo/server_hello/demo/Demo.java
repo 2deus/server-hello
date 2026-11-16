@@ -1,4 +1,4 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.demo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

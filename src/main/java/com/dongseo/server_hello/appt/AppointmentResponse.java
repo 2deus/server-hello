@@ -1,4 +1,4 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.appt;
 
 import java.time.LocalDateTime;
 

@@ -1,17 +1,11 @@
-package com.dongseo.server_hello.Controller;
+package com.dongseo.server_hello.demo;
 
-import com.dongseo.server_hello.Demo;
-import com.dongseo.server_hello.DemoCreateRequest;
-import com.dongseo.server_hello.DemoResponse;
-import com.dongseo.server_hello.Service.DemoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 
 @RestController

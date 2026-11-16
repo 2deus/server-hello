@@ -1,9 +1,5 @@
-package com.dongseo.server_hello.Controller;
+package com.dongseo.server_hello.appt;
 
-import com.dongseo.server_hello.Appointment;
-import com.dongseo.server_hello.AppointmentCreateRequest;
-import com.dongseo.server_hello.AppointmentResponse;
-import com.dongseo.server_hello.Service.AppointmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

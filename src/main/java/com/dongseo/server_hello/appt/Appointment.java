@@ -1,5 +1,6 @@
-package com.dongseo.server_hello;
+package com.dongseo.server_hello.appt;
 
+import com.dongseo.server_hello.demo.Demo;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -11,7 +12,7 @@ public class Appointment {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "demo_id")
-    private Demo            demo;
+    private Demo demo;
 
     private String          appointedBy;
     private LocalDateTime   startTime;

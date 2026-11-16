@@ -1,8 +1,6 @@
-package com.dongseo.server_hello.Service;
+package com.dongseo.server_hello.demo;
 
-import com.dongseo.server_hello.Demo;
 import com.dongseo.server_hello.Exception.NotFoundException;
-import com.dongseo.server_hello.Repository.DemoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
