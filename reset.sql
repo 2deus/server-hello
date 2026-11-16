@@ -1,4 +1,4 @@
--- Back to the starting state: 3 rooms, 5 reservations, 3 accounts. Run inside roomdb (USE roomdb;).
+-- Back to the starting state: 3 rooms, 5 reservations, 3 accounts. Run inside demodb (USE demodb;).
 DROP TABLE IF EXISTS app_user;
 DROP TABLE IF EXISTS appointment;
 DROP TABLE IF EXISTS demo;
@@ -13,7 +13,7 @@ CREATE TABLE demo (
 CREATE TABLE appointment (
     id           BIGINT      AUTO_INCREMENT PRIMARY KEY,
     demo_id      BIGINT      NOT NULL,
-    appointed_by  VARCHAR(50) NOT NULL,
+    appointed_by  VARCHAR(100) NOT NULL,
     start_time   DATETIME    NOT NULL,
     end_time     DATETIME    NOT NULL,
     CONSTRAINT fk_appointment_demo FOREIGN KEY (demo_id) REFERENCES demo (id)

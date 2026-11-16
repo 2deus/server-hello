@@ -48,8 +48,8 @@ This project uses [MySQL](https://www.mysql.com/) to store surviving data.
 | `id`           | BIGINT      | Primary key, auto-generated         |
 | `demo_id`      | BIGINT      | NOT NULL, foreign key to `demo(id)` |
 | `appointed_by` | VARCHAR(50) | NOT NULL                            |
-| `start_time`   | TIMESTAMP   | NOT NULL                            |
-| `end_time`     | TIMESTAMP   | NOT NULL                            |
+| `start_time`   | DATETIME    | NOT NULL                            |
+| `end_time`     | DATETIME    | NOT NULL                            |
 
 ### Relationship
 
@@ -78,6 +78,8 @@ CREATE USER 'demoapp'@'localhost' IDENTIFIED BY 'demoapp1234';
 GRANT ALL PRIVILEGES ON demodb.* TO 'demoapp'@'localhost';
 FLUSH PRIVILEGES;
 ```
+*NOTE: linux users might experience unexpected behavior when using `localhost` to loopback instead of 127.0.0.1*
+
 4. Run `reset.sql`:
 ```mysql
 use demodb;
@@ -98,8 +100,6 @@ update demo
 ```
 
 The select loads the existing room by id (findById), and the update then writes the new name and capacity back because they differ from the loaded row (save).
-
-*NOTE: Claude Sonnet 5.5 helped me come up with the idea of `ApiExceptionHandler.java` and guided me through realizing it.*
 
 ## Dependencies
 

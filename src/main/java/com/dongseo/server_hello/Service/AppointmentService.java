@@ -3,6 +3,7 @@ package com.dongseo.server_hello.Service;
 import com.dongseo.server_hello.Appointment;
 import com.dongseo.server_hello.Demo;
 import com.dongseo.server_hello.Exception.ConflictException;
+import com.dongseo.server_hello.Exception.NotFoundException;
 import com.dongseo.server_hello.Repository.AppointmentRepository;
 import com.dongseo.server_hello.Repository.DemoRepository;
 import jakarta.transaction.Transactional;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AppointmentService {
@@ -22,36 +22,27 @@ public class AppointmentService {
         this.appointmentRepository = appointmentRepository;
     }
 
-    public Optional<List<Appointment>> findByRoom(Long demoId) {
-        if(!demoRepository.existsById(demoId)) return Optional.empty();
-        return Optional.of(appointmentRepository.findByDemoIdOrderByStartTime(demoId));
+    public List<Appointment> findByRoom(Long demoId) {
+        if (!demoRepository.existsById(demoId)) throw new NotFoundException("room " + demoId + " not found");
+        return appointmentRepository.findByDemoIdOrderByStartTime(demoId);
     }
 
-    public List<Appointment> findUsingAppointedBy(String name) {
-        return appointmentRepository.findByAppointedByOrderByStartTime(name);
-    }
+    public List<Appointment> findByAppointedBy(String name) {
+        List<Appointment> result = appointmentRepository.findByAppointedByWithDemo(name);
 
-    public List<Appointment> findByReservedBy(String name) {
-        return appointmentRepository.findByAppointedByWithDemo(name);
-    }
-
-    //TODO: move to AppointmentExceptionHandler
-    private void checkRequest(String appointedBy, LocalDateTime startTime, LocalDateTime endTime) {
-        if (appointedBy == null || appointedBy.isBlank()) throw new IllegalArgumentException("appointedBy is required");
-        if (startTime == null || endTime == null) throw new IllegalArgumentException("Both startTime and endTime are required");
-        if (endTime.isBefore(startTime)) throw new IllegalArgumentException("startTime is before endTime");
+        if (result.isEmpty()) throw new NotFoundException("No reservations found for " + name);
+        return result;
     }
 
     @Transactional
-    public Optional<Appointment> create(Long demoId, String appointedBy, LocalDateTime startTime, LocalDateTime endTime) {
-        checkRequest(appointedBy, startTime, endTime);
-        Optional<Demo> demo = demoRepository.findById(demoId);
-        if (demo.isEmpty()) return Optional.empty();
+    public Appointment create(Long demoId, String appointedBy, LocalDateTime startTime, LocalDateTime endTime) {
+        Demo demo = demoRepository.findById(demoId)
+                .orElseThrow(() -> new NotFoundException("room " + demoId + " not found"));
 
-        if (appointmentRepository.isOverlapping(demoId, endTime, startTime)) {
+        if (appointmentRepository.isOverlapping(demoId, startTime, endTime)) {
             throw new ConflictException("Room is already booked for that time");
         }
 
-        return Optional.of(appointmentRepository.save(new Appointment(demo.get(), appointedBy, startTime, endTime)));
+        return appointmentRepository.save(new Appointment(demo, appointedBy, startTime, endTime));
     }
 }

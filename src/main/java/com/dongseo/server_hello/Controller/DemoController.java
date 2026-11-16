@@ -51,7 +51,10 @@ public class DemoController {
     @PostMapping("/rooms")
     public ResponseEntity<DemoResponse> create(@Valid @RequestBody DemoCreateRequest req) {
         Demo demo = demoService.createDemo(req.name(), req.capacity());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DemoResponse.from(demo));
+        //return ResponseEntity.status(HttpStatus.CREATED).body(DemoResponse.from(demo));
+        return ResponseEntity
+                        .created(URI.create("/api/rooms/" + demo.getId())) //for location header
+                        .body(DemoResponse.from(demo));
     }
 
     @PutMapping("/rooms/{id}")
