@@ -43,13 +43,13 @@ This project uses [MySQL](https://www.mysql.com/) to store surviving data.
 
 ### Table `appointment`
 
-| Column         | Type        | Constraints                         |
-|----------------|-------------|-------------------------------------|
-| `id`           | BIGINT      | Primary key, auto-generated         |
-| `demo_id`      | BIGINT      | NOT NULL, foreign key to `demo(id)` |
-| `appointed_by` | VARCHAR(50) | NOT NULL                            |
-| `start_time`   | DATETIME    | NOT NULL                            |
-| `end_time`     | DATETIME    | NOT NULL                            |
+| Column         | Type         | Constraints                         |
+|----------------|--------------|-------------------------------------|
+| `id`           | BIGINT       | Primary key, auto-generated         |
+| `demo_id`      | BIGINT       | NOT NULL, foreign key to `demo(id)` |
+| `appointed_by` | VARCHAR(100) | NOT NULL                            |
+| `start_time`   | DATETIME     | NOT NULL                            |
+| `end_time`     | DATETIME     | NOT NULL                            |
 
 ### Relationship
 
@@ -86,7 +86,7 @@ use demodb;
 source /path/to/root/of/project/reset.sql;
 ```
 
-The web layer returns 409 through `DemoExceptionHandler`, because HTTP status codes belong here, so the handler only translates exceptions thrown by the database.
+The web layer returns 409 through `ApiExceptionHandler`, because HTTP status codes belong here, so the handler only translates exceptions thrown by the database.
 
 Hibernate:
 ```mysql
