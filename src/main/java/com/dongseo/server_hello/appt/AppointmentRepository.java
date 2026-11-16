@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     List<Appointment> findByDemoIdOrderByStartTime(Long roomId);
@@ -20,4 +21,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT a FROM Appointment a JOIN FETCH a.demo WHERE a.appointedBy = :name ORDER BY a.startTime")
     List<Appointment> findByAppointedByWithDemo(@Param("name") String name);
+
+    @Query("SELECT a FROM Appointment a JOIN FETCH a.demo WHERE a.id = :id")
+    Optional<Appointment> findByIdWithDemo(@Param("id") Long id);
 }

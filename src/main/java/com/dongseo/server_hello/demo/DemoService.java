@@ -1,8 +1,10 @@
 package com.dongseo.server_hello.demo;
 
+import com.dongseo.server_hello.Exception.ConflictException;
 import com.dongseo.server_hello.Exception.NotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -45,8 +47,17 @@ public class DemoService {
         return demo;
     }
 
+    @Transactional
     public void delete(Long id) {
-        if (!demoRepository.existsById(id)) throw new NotFoundException("room " + id + " not found");
-        demoRepository.deleteById(id);
+        // findByIdForUpdate makes sure a DELETE and a booking of one room can't mix
+        Demo demo = demoRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new NotFoundException("room " + id + " not found"));
+        try {
+            demoRepository.delete(demo);
+            demoRepository.flush(); // run DELETE now so I can go to sleep
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new ConflictException("room " + id + " has reservations");
+        }
     }
 }

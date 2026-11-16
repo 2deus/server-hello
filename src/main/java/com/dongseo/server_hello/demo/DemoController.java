@@ -19,12 +19,11 @@ public class DemoController {
     }
 
     @GetMapping("/stats")
-    @ResponseStatus(HttpStatus.OK)
-    public long countRooms(@RequestParam(defaultValue = "0") int minCapacity) {
-        return demoService.count(minCapacity);
+    public DemoStatsResponse countRooms(@RequestParam(defaultValue = "0") int minCapacity) {
+        return new DemoStatsResponse(demoService.count(minCapacity));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/name")
     @ResponseStatus(HttpStatus.OK)
     public String findOneDemo(@PathVariable Long id) {
         return demoService.getNameFromId(id);

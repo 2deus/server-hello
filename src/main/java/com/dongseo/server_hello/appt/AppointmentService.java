@@ -4,8 +4,8 @@ import com.dongseo.server_hello.demo.Demo;
 import com.dongseo.server_hello.Exception.ConflictException;
 import com.dongseo.server_hello.Exception.NotFoundException;
 import com.dongseo.server_hello.demo.DemoRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,13 +32,25 @@ public class AppointmentService {
         return result;
     }
 
+    public Appointment find(Long id) {
+        return appointmentRepository.findByIdWithDemo(id)
+                .orElseThrow(() -> new NotFoundException("reservation " + id + " not found"));
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        if (!appointmentRepository.existsById(id)) throw new NotFoundException("reservation " + id + " not found");
+        appointmentRepository.deleteById(id);
+    }
+
     @Transactional
     public Appointment create(Long demoId, String appointedBy, LocalDateTime startTime, LocalDateTime endTime) {
-        Demo demo = demoRepository.findById(demoId)
+        // lock room row so concurrent bookings and deletes of the same room run one at a time
+        Demo demo = demoRepository.findByIdForUpdate(demoId)
                 .orElseThrow(() -> new NotFoundException("room " + demoId + " not found"));
 
         if (appointmentRepository.isOverlapping(demoId, startTime, endTime)) {
-            throw new ConflictException("Room is already booked for that time");
+            throw new ConflictException("room " + demoId +" is already booked for that time");
         }
 
         return appointmentRepository.save(new Appointment(demo, appointedBy, startTime, endTime));

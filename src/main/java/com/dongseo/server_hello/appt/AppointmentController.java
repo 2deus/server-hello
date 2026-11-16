@@ -1,6 +1,7 @@
 package com.dongseo.server_hello.appt;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,17 @@ public class AppointmentController {
                 .toList();
     }
 
-    //TODO: /api/reservations/{id}; location header of this mapping points to 404 for now
+    @GetMapping("/reservations/{id}")
+    public AppointmentResponse findAppointment(@PathVariable Long id) {
+        return AppointmentResponse.from(appointmentService.find(id));
+    }
+
+    @DeleteMapping("/reservations/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        appointmentService.delete(id);
+    }
+
     @PostMapping("/rooms/{demoId}/reservations")
     public ResponseEntity<AppointmentResponse> create(@PathVariable Long demoId, @Valid @RequestBody AppointmentCreateRequest req) {
         Appointment appt = appointmentService.create(demoId, req.appointedBy(), req.startTime(), req.endTime());

@@ -39,7 +39,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> badJSON(MethodArgumentTypeMismatchException e, HttpServletRequest req) {
-        return respond(HttpStatus.BAD_REQUEST, "'id' has wrong type", req, List.of());
+        return respond(HttpStatus.BAD_REQUEST, "'" + e.getName() +"' has wrong type", req, List.of());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
