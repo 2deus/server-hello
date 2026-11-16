@@ -3,6 +3,7 @@ package com.dongseo.server_hello.Exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -33,6 +35,16 @@ public class ApiExceptionHandler {
                         f.getField(), f.getDefaultMessage()
                 )).toList();
         return respond(HttpStatus.BAD_REQUEST, "request has invalid fields", req, fields);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> badJSON(MethodArgumentTypeMismatchException e, HttpServletRequest req) {
+        return respond(HttpStatus.BAD_REQUEST, "'id' has wrong type", req, List.of());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> badJSON(HttpMessageNotReadableException e, HttpServletRequest req) {
+        return respond(HttpStatus.BAD_REQUEST, "request body is missing or is not valid JSON", req, List.of());
     }
 
     @ExceptionHandler(NotFoundException.class)
