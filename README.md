@@ -27,6 +27,25 @@ Claude Opus 5.5 was used for Java questions and consulting. Code is written by h
 | DELETE | /api/2                     | HTTP/1.1 409 CONFLICT             | Delete a room at id 2, which has reservations                          |
 | DELETE | /api/{id}                  | HTTP/1.1 404 NOT FOUND            | Delete room at id 1337 (non-existent)                                  |
 
+## Appointment endpoint table
+
+---
+| Method | Path                                 | Status                            | Purpose                                                              |
+|--------|--------------------------------------|-----------------------------------|----------------------------------------------------------------------|
+| GET    | /api/rooms/1/reservations            | HTTP/1.1 200 OK                   | List all appointments of room 1, ordered by start time               |
+| GET    | /api/rooms/1337/reservations         | HTTP/1.1 404 NOT FOUND            | List appointments of room 1337 (non-existent)                        |
+| GET    | /api/reservations?appointedBy=Mina   | HTTP/1.1 200 OK                   | List all appointments made by Mina, with room names                  |
+| GET    | /api/reservations?appointedBy=Nobody | HTTP/1.1 404 NOT FOUND            | List appointments of someone who has none                            |
+| GET    | /api/reservations                    | HTTP/1.1 400 BAD REQUEST          | Search without the `appointedBy` query parameter                     |
+| GET    | /api/reservations/1                  | HTTP/1.1 200 OK                   | Get appointment at id 1                                              |
+| GET    | /api/reservations/1337               | HTTP/1.1 404 NOT FOUND            | Get appointment at id 1337 (non-existent)                            |
+| POST   | /api/rooms/1/reservations            | HTTP/1.1 201 CREATED / ...headers | Book room 1; `Location` points to `/api/reservations/{id}`           |
+| POST   | /api/rooms/1/reservations            | HTTP/1.1 400 BAD REQUEST          | Book room 1 with blank `appointedBy`, missing time, or end < start   |
+| POST   | /api/rooms/1/reservations            | HTTP/1.1 409 CONFLICT             | Book room 1 at a time that overlaps an existing appointment          |
+| POST   | /api/rooms/1337/reservations         | HTTP/1.1 404 NOT FOUND            | Book room 1337 (non-existent)                                        |
+| DELETE | /api/reservations/1                  | HTTP/1.1 204 EMPTY                | Cancel appointment at id 1                                           |
+| DELETE | /api/reservations/1337               | HTTP/1.1 404 NOT FOUND            | Cancel appointment at id 1337 (non-existent)                         |
+
 ## Database
 
 This project uses [MySQL](https://www.mysql.com/) to store surviving data.
