@@ -1,7 +1,7 @@
 # Dongseo University Spring Boot Demo
 
 ---
-This API is for creating, reading, updating, and deleting an array of rooms in the university.
+This API is for creating, reading, updating, and deleting an array of rooms in the university and managing their reservations.
 
 Claude Opus 5.5 was used for Java questions and consulting. Code is written by hand.
 
