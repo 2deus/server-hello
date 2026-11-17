@@ -10,7 +10,7 @@ Claude Opus 5.5 was used for Java questions and consulting. Code is written by h
 ---
 | Method | Path                       | Status                            | Purpose                                                                |
 |--------|----------------------------|-----------------------------------|------------------------------------------------------------------------|
-| GET    | /api/{id}                  | HTTP/1.1 200 OK                   | Get room name of room at id                                            |
+| GET    | /api/{id}/name             | HTTP/1.1 200 OK                   | Get room name of room at id                                            |
 | GET    | /api/rooms                 | HTTP/1.1 200 OK                   | List all rooms                                                         |
 | GET    | /api/rooms/{id}            | HTTP/1.1 200 OK                   | Get room at id                                                         |
 | GET    | /api/rooms/1337            | HTTP/1.1 404 NOT FOUND            | Get room at id 1337 (non-existent)                                     |

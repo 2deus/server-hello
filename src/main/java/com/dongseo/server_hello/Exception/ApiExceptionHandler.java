@@ -13,6 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
+
 import java.util.List;
 
 @RestControllerAdvice
@@ -62,9 +66,18 @@ public class ApiExceptionHandler {
         return respond(HttpStatus.BAD_REQUEST, e.getMessage(), req, List.of());
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> unauthorized(AuthenticationException e, HttpServletRequest req) {
+        String message = "login required";
+        if (e instanceof BadCredentialsException) { message = "wrong username or password"; }
+        else if (e instanceof InvalidBearerTokenException) { message = "token is invalid or expired"; }
+        return respond(HttpStatus.UNAUTHORIZED,
+                message, req, List.of());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> other(Exception e, HttpServletRequest req) {
-        // spring exceptions (unknown url, wrong method, missing param, etc)
+        // spring exceptions (unknown url, wrong method, missing param, etc.)
         if (e instanceof ErrorResponse spring) {
             HttpStatus status = HttpStatus.valueOf(spring.getStatusCode().value());
             return respond(status, spring.getBody().getDetail(), req, List.of());
