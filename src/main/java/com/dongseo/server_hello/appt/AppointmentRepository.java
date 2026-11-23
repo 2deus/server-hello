@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     List<Appointment> findByDemoIdOrderByStartTime(Long roomId);
-    List<Appointment> findByAppointedByOrderByStartTime(String appointedBy);
+    List<Appointment> findByOwnerIdOrderByStartTime(Long ownerId);
 
     boolean existsByDemoId(Long roomId);
 
@@ -19,9 +19,15 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                           @Param("startTime") LocalDateTime startTime,
                           @Param("endTime") LocalDateTime endTime);
 
-    @Query("SELECT a FROM Appointment a JOIN FETCH a.demo WHERE a.appointedBy = :name ORDER BY a.startTime")
-    List<Appointment> findByAppointedByWithDemo(@Param("name") String name);
+    @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.demo.id = :demoId AND a.startTime < :endTime AND a.endTime > :startTime AND a.id <> :id")
+    boolean isOverlappingExcept(@Param("demoId") Long demoId,
+                                @Param("id") Long id,
+                                @Param("startTime") LocalDateTime startTime,
+                                @Param("endTime") LocalDateTime endTime);
 
-    @Query("SELECT a FROM Appointment a JOIN FETCH a.demo WHERE a.id = :id")
+    @Query("SELECT a FROM Appointment a JOIN FETCH a.demo JOIN FETCH a.owner WHERE a.owner.id = :ownerId ORDER BY a.startTime")
+    List<Appointment> findByOwnerIdWithDemo(@Param("ownerId") Long ownerId);
+
+    @Query("SELECT a FROM Appointment a JOIN FETCH a.demo JOIN FETCH a.owner WHERE a.id = :id")
     Optional<Appointment> findByIdWithDemo(@Param("id") Long id);
 }

@@ -1,5 +1,8 @@
 package com.dongseo.server_hello.appt;
 
+import com.dongseo.server_hello.AppUser.AppUser;
+import com.dongseo.server_hello.AppUser.AppUserRepository;
+import com.dongseo.server_hello.Exception.ForbiddenException;
 import com.dongseo.server_hello.demo.Demo;
 import com.dongseo.server_hello.Exception.ConflictException;
 import com.dongseo.server_hello.Exception.NotFoundException;
@@ -14,10 +17,12 @@ import java.util.List;
 public class AppointmentService {
     private final DemoRepository demoRepository;
     private final AppointmentRepository appointmentRepository;
+    private final AppUserRepository appUserRepository;
 
-    public AppointmentService(DemoRepository demoRepository, AppointmentRepository appointmentRepository) {
+    public AppointmentService(DemoRepository demoRepository, AppointmentRepository appointmentRepository, AppUserRepository appUserRepository) {
         this.demoRepository = demoRepository;
         this.appointmentRepository = appointmentRepository;
+        this.appUserRepository = appUserRepository;
     }
 
     public List<Appointment> findByRoom(Long demoId) {
@@ -25,26 +30,37 @@ public class AppointmentService {
         return appointmentRepository.findByDemoIdOrderByStartTime(demoId);
     }
 
-    public List<Appointment> findByAppointedBy(String name) {
-        List<Appointment> result = appointmentRepository.findByAppointedByWithDemo(name);
+    public List<Appointment> findByOwnerId(String username) {
+        AppUser owner = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("user " + username + " not found"));
 
-        if (result.isEmpty()) throw new NotFoundException("No reservations found for " + name);
+        List<Appointment> result = appointmentRepository.findByOwnerIdWithDemo(owner.getId());
+
+        if (result.isEmpty()) throw new NotFoundException("No reservations found for " + username);
         return result;
     }
 
-    public Appointment find(Long id) {
-        return appointmentRepository.findByIdWithDemo(id)
+    // 404 first (does it exist?), then 403 (is it yours?)
+    public Appointment find(Long id, String username, boolean admin) {
+        Appointment a = appointmentRepository.findByIdWithDemo(id)
                 .orElseThrow(() -> new NotFoundException("reservation " + id + " not found"));
+
+        if (!admin && !a.isOwnedBy(username)) {
+            throw new ForbiddenException("reservation " + id + " belongs to another user");
+        }
+        return a;
     }
 
     @Transactional
-    public void delete(Long id) {
-        if (!appointmentRepository.existsById(id)) throw new NotFoundException("reservation " + id + " not found");
-        appointmentRepository.deleteById(id);
+    public void delete(Long id, String username, boolean admin) {
+        appointmentRepository.delete(find(id, username, admin));
     }
 
     @Transactional
-    public Appointment create(Long demoId, String appointedBy, LocalDateTime startTime, LocalDateTime endTime) {
+    public Appointment create(Long demoId, String username, LocalDateTime startTime, LocalDateTime endTime) {
+        AppUser owner = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("user " + username + " not found"));
+
         // lock room row so concurrent bookings and deletes of the same room run one at a time
         Demo demo = demoRepository.findByIdForUpdate(demoId)
                 .orElseThrow(() -> new NotFoundException("room " + demoId + " not found"));
@@ -53,6 +69,6 @@ public class AppointmentService {
             throw new ConflictException("room " + demoId +" is already booked for that time");
         }
 
-        return appointmentRepository.save(new Appointment(demo, appointedBy, startTime, endTime));
+        return appointmentRepository.save(new Appointment(demo, owner, startTime, endTime));
     }
 }

@@ -1,5 +1,6 @@
 package com.dongseo.server_hello.appt;
 
+import com.dongseo.server_hello.AppUser.AppUser;
 import com.dongseo.server_hello.demo.Demo;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -14,17 +15,24 @@ public class Appointment {
     @JoinColumn(name = "demo_id")
     private Demo demo;
 
-    private String          appointedBy;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "owner_id")
+    private AppUser owner;
+
     private LocalDateTime   startTime;
     private LocalDateTime   endTime;
 
     protected Appointment() {}
 
-    public Appointment(Demo demo, String appointedBy, LocalDateTime startTime, LocalDateTime endTime) {
+    public Appointment(Demo demo, AppUser owner, LocalDateTime startTime, LocalDateTime endTime) {
         this.demo = demo;
-        this.appointedBy = appointedBy;
+        this.owner = owner;
         this.startTime = startTime;
         this.endTime = endTime;
+    }
+
+    public boolean isOwnedBy(String username) {
+        return owner.getUsername().equals(username);
     }
 
     public Long getId() {
@@ -35,9 +43,7 @@ public class Appointment {
         return demo;
     }
 
-    public String getAppointedBy() {
-        return appointedBy;
-    }
+    public AppUser getOwner() { return owner; }
 
     public LocalDateTime getStartTime() {
         return startTime;

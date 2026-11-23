@@ -8,10 +8,6 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public record AppointmentCreateRequest(
-        @NotBlank(message = "`appointedBy` cannot be blank")
-        @Size(max = 100, message = "`appointedBy` field must be at most 100 characters")
-        String appointedBy,
-
         @NotNull
         LocalDateTime startTime,
 

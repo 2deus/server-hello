@@ -14,7 +14,10 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -23,10 +26,18 @@ import java.nio.charset.StandardCharsets;
 
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 public class SecurityConfig {
+    private final ApiAccessDeniedHandler accessDeniedHandler;
+
+    public SecurityConfig(ApiAccessDeniedHandler accessDeniedHandler) {
+        this.accessDeniedHandler = accessDeniedHandler;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -35,21 +46,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, ApiAuthenticationEntryPoint entryPoint) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable) // no browser forms/cookies = no CSRF
-            .sessionManagement(s -> s.sessionCreationPolicy(STATELESS)) // no session = logs in each time
+            .csrf(AbstractHttpConfigurer::disable)                              // no browser forms/cookies = no CSRF
+            .sessionManagement(s -> s
+                    .sessionCreationPolicy(STATELESS))                          // no session = must log in each time
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(POST, "/api/auth/signup").permitAll()
-                    .requestMatchers(POST, "/api/auth/login").permitAll()
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
-                            "/swagger-ui.html", "/error").permitAll()
-                    .requestMatchers(GET, "/api/auth/me").authenticated()   // must be ABOVE GET /api/**
-                    .requestMatchers(GET, "/api/**").permitAll()            // reading is public
+                    .requestMatchers(POST,   "/api/auth/signup").permitAll()
+                    .requestMatchers(POST,   "/api/auth/login").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/error").permitAll()
+
+                    .requestMatchers(GET,    "/api/auth/me").authenticated()
+                    .requestMatchers(GET,    "/api/reservations/**").authenticated()
+                    .requestMatchers(GET,    "/api/**").permitAll()            // GET'ing the rest of /api/ is public
+            //rule D - only ADMIN creates, changes or deletes
+                    .requestMatchers(POST,   "/api/rooms").hasRole("ADMIN")
+                    .requestMatchers(PUT,    "/api/rooms/*").hasRole("ADMIN")
+                    .requestMatchers(DELETE, "/api/rooms/*").hasRole("ADMIN")
                     .anyRequest().authenticated())                              // everything else needs a login
             .httpBasic(b -> b.authenticationEntryPoint(entryPoint))                 // wrong Basic login = 401
-                .oauth2ResourceServer(o -> o
-                        .authenticationEntryPoint(entryPoint)
-                        .jwt(Customizer.withDefaults()))
-            .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint)); // no login = 401
+                    .oauth2ResourceServer(o -> o
+                            .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                            .authenticationEntryPoint(entryPoint)               // handle OAuth2 401
+                            .accessDeniedHandler(accessDeniedHandler))          // handle OAuth2 403
+            .exceptionHandling(e -> e
+                    .authenticationEntryPoint(entryPoint)                       // no login = 401
+                    .accessDeniedHandler(accessDeniedHandler));                 // wrong role = 403
         return http.build();
     }
 
@@ -58,13 +78,28 @@ public class SecurityConfig {
         return new SecretKeySpec(
                 secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
     }
+
     @Bean
     public JwtEncoder jwtEncoder(SecretKey jwtKey) {
         return new NimbusJwtEncoder(new ImmutableSecret<>(jwtKey));
     }
+
     @Bean
     public JwtDecoder jwtDecoder(SecretKey jwtKey) {
         return NimbusJwtDecoder.withSecretKey(jwtKey)
                 .macAlgorithm(MacAlgorithm.HS256).build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter roles = new JwtGrantedAuthoritiesConverter();
+
+        roles.setAuthoritiesClaimName("role");
+        roles.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(roles);
+        return converter;
     }
 }

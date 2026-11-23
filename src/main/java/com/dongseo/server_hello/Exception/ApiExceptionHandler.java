@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -73,6 +74,16 @@ public class ApiExceptionHandler {
         else if (e instanceof InvalidBearerTokenException) { message = "token is invalid or expired"; }
         return respond(HttpStatus.UNAUTHORIZED,
                 message, req, List.of());
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> forbidden(ForbiddenException e, HttpServletRequest req) {
+        return respond(HttpStatus.FORBIDDEN, e.getMessage(), req, List.of());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> accessDenied(AccessDeniedException e, HttpServletRequest req) {
+        return respond(HttpStatus.FORBIDDEN, "admin role required", req, List.of());
     }
 
     @ExceptionHandler(Exception.class)
