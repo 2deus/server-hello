@@ -48,17 +48,22 @@ public class AppointmentController {
         return AppointmentResponse.from(appointmentService.find(id, auth.getName(), isAdmin(auth)));
     }
 
-    @DeleteMapping("/reservations/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id, Authentication auth) {
-        appointmentService.delete(id, auth.getName(), isAdmin(auth));
-    }
-
     @PostMapping("/rooms/{demoId}/reservations")
     public ResponseEntity<AppointmentResponse> create(@PathVariable Long demoId, @Valid @RequestBody AppointmentCreateRequest req, Authentication auth) {
         Appointment a = appointmentService.create(demoId, auth.getName(), req.startTime(), req.endTime());
         return ResponseEntity
                 .created(URI.create("/api/reservations/" + a.getId()))
                 .body(AppointmentResponse.from(a));
+    }
+
+    @PutMapping("/reservations/{id}")
+    public AppointmentResponse reschedule(@PathVariable Long id, @Valid @RequestBody AppointmentCreateRequest req, Authentication auth) {
+        return AppointmentResponse.from(appointmentService.reschedule(id, auth.getName(), req.startTime(), req.endTime()));
+    }
+
+    @DeleteMapping("/reservations/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id, Authentication auth) {
+        appointmentService.delete(id, auth.getName(), isAdmin(auth));
     }
 }

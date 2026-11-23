@@ -15,18 +15,24 @@ import java.util.List;
 
 @Service
 public class AppointmentService {
-    private final DemoRepository demoRepository;
+    private final DemoRepository        demoRepository;
     private final AppointmentRepository appointmentRepository;
-    private final AppUserRepository appUserRepository;
+    private final AppUserRepository     appUserRepository;
 
     public AppointmentService(DemoRepository demoRepository, AppointmentRepository appointmentRepository, AppUserRepository appUserRepository) {
-        this.demoRepository = demoRepository;
+        this.demoRepository        = demoRepository;
         this.appointmentRepository = appointmentRepository;
-        this.appUserRepository = appUserRepository;
+        this.appUserRepository     = appUserRepository;
+    }
+
+    private Appointment findById(Long id) {
+        return appointmentRepository.findByIdWithDemo(id)
+                .orElseThrow(() -> new NotFoundException("reservation " + id + " not found"));
     }
 
     public List<Appointment> findByRoom(Long demoId) {
-        if (!demoRepository.existsById(demoId)) throw new NotFoundException("room " + demoId + " not found");
+        if (!demoRepository.existsById(demoId))
+            throw new NotFoundException("room " + demoId + " not found");
         return appointmentRepository.findByDemoIdOrderByStartTime(demoId);
     }
 
@@ -36,24 +42,18 @@ public class AppointmentService {
 
         List<Appointment> result = appointmentRepository.findByOwnerIdWithDemo(owner.getId());
 
-        if (result.isEmpty()) throw new NotFoundException("No reservations found for " + username);
+        if (result.isEmpty())
+            throw new NotFoundException("No reservations found for " + username);
         return result;
     }
 
     // 404 first (does it exist?), then 403 (is it yours?)
     public Appointment find(Long id, String username, boolean admin) {
-        Appointment a = appointmentRepository.findByIdWithDemo(id)
-                .orElseThrow(() -> new NotFoundException("reservation " + id + " not found"));
+        Appointment a = findById(id);
 
-        if (!admin && !a.isOwnedBy(username)) {
+        if (!admin && !a.isOwnedBy(username))
             throw new ForbiddenException("reservation " + id + " belongs to another user");
-        }
         return a;
-    }
-
-    @Transactional
-    public void delete(Long id, String username, boolean admin) {
-        appointmentRepository.delete(find(id, username, admin));
     }
 
     @Transactional
@@ -65,10 +65,26 @@ public class AppointmentService {
         Demo demo = demoRepository.findByIdForUpdate(demoId)
                 .orElseThrow(() -> new NotFoundException("room " + demoId + " not found"));
 
-        if (appointmentRepository.isOverlapping(demoId, startTime, endTime)) {
+        if (appointmentRepository.isOverlapping(demoId, startTime, endTime))
             throw new ConflictException("room " + demoId +" is already booked for that time");
-        }
 
         return appointmentRepository.save(new Appointment(demo, owner, startTime, endTime));
+    }
+
+    @Transactional
+    public Appointment reschedule(Long id, String username, LocalDateTime start, LocalDateTime end) {
+        Appointment a = findById(id);
+        if (!a.isOwnedBy(username))
+            throw new ForbiddenException("reservation " + id + " belongs to another user");
+
+        if (appointmentRepository.isOverlappingExcept(a.getDemo().getId(), id, start, end))
+            throw new ConflictException("room " + a.getDemo().getId() + " is already booked for that time");
+        a.reschedule(start, end);
+        return a;
+    }
+
+    @Transactional
+    public void delete(Long id, String username, boolean admin) {
+        appointmentRepository.delete(find(id, username, admin));
     }
 }

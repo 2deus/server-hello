@@ -19,6 +19,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                           @Param("startTime") LocalDateTime startTime,
                           @Param("endTime") LocalDateTime endTime);
 
+    //skip itself when checking for available spot
     @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.demo.id = :demoId AND a.startTime < :endTime AND a.endTime > :startTime AND a.id <> :id")
     boolean isOverlappingExcept(@Param("demoId") Long demoId,
                                 @Param("id") Long id,

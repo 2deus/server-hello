@@ -35,21 +35,16 @@ public class Appointment {
         return owner.getUsername().equals(username);
     }
 
-    public Long getId() {
-        return id;
+    public void reschedule(LocalDateTime start, LocalDateTime end) {
+        startTime = start;
+        endTime   = end;
     }
 
-    public Demo getDemo() {
-        return demo;
-    }
+    //getters
 
-    public AppUser getOwner() { return owner; }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
+    public Long          getId()        { return id; }
+    public Demo          getDemo()      { return demo; }
+    public AppUser       getOwner()     { return owner; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public LocalDateTime getEndTime()   { return endTime; }
 }
