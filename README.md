@@ -5,6 +5,31 @@ This API is for creating, reading, updating, and deleting an array of rooms in t
 
 Claude Opus 5.5 was used for Java questions and consulting. Code is written by hand.
 
+## Authorization
+
+---
+Accounts live in `app_user` table. Passwords are stored as BCrypt hashes. 2 roles for any account: `USER` or `ADMIN`. Signing up always gives `USER`, even if a request asks otherwise.
+
+### Logging in
+
+There are 2 ways to authenticate:
+
+1. **HTTP Basic:** send `Authorization: Basic <base64 of username:password>` with every request.
+2. **JWT (Bearer token):** call `POST /api/auth/login` once with `{ "username": "...", "password": "..." }`. The answer contains an `accessToken`, valid for 30 minutes (`app.jwt.ttl-minutes`). Send it as `Authorization: Bearer <accessToken>` on later requests.
+
+The token is signed with HS256 using `JWT_SECRET` from `.env`. It carries the username (`sub`) and the role (`role`), which Spring turns into `ROLE_USER` or `ROLE_ADMIN`.
+
+### Rules
+
+| Rule | Who                                            | Where it is checked                 |
+|------|------------------------------------------------|-------------------------------------|
+| A    | Anyone may read rooms                          | `SecurityConfig`                    |
+| B    | Reservations need a login                      | `SecurityConfig`                    |
+| C    | A reservation belongs to its owner             | `AppointmentService` (needs the DB) |
+| D    | Only `ADMIN` creates, changes or deletes rooms | `SecurityConfig`                    |
+
+`SecurityConfig` can only see the method, the URL and the role. Ownership (rule C) needs the reservation row, so the service loads it first (404 if missing), then compares the owner (403 if belongs to someone else).
+
 ## Endpoint table
 
 ---
@@ -167,13 +192,13 @@ Run the .jar:
 ### Windows
 
 ```bash
-java -jar build\libs\server-hello-1.2.jar
+java -jar build\libs\server-hello-2.0.jar
 ```
 
 ### Linux
 
 ```bash
-java -jar build/libs/server-hello-1.2.jar
+java -jar build/libs/server-hello-2.0.jar
 ```
 
 *Note: version may change. Check build.gradle in build\libs (after running the first line)*
