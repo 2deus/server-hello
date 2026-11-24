@@ -14,8 +14,8 @@ public record AppointmentCreateRequest(
         @NotNull
         LocalDateTime endTime) {
 
-    @AssertTrue(message = "endTime must not be before startTime")
+    @AssertTrue(message = "startTime must be before endTime")
     public boolean isEndTimeValid() {
-        return startTime == null || endTime == null || !endTime.isBefore(startTime);
+        return startTime == null || endTime == null || startTime.isBefore(endTime);
     }
 }

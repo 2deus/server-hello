@@ -145,6 +145,47 @@ update demo
 
 The select loads the existing room by id (findById), and the update then writes the new name and capacity back because they differ from the loaded row (save).
 
+## Tests
+
+---
+| Class                         | Kind                         | What it checks                                                                                   |
+|-------------------------------|------------------------------|--------------------------------------------------------------------------------------------------|
+| `ReservationServiceTest`      | Service test (JUnit+Mockito) | `AppointmentService` rules (400, 404, 403, 409, owner/admin) with fake repositories. No database |
+| `ApiFailureTest`              | API test (MockMvc)           | The whole app: status code and `ApiError` message for 401, 403, 409, 400, 404                    |
+| `ServerHelloApplicationTests` | Native test                  | The application context starts                                                                   |
+
+### Before running
+
+`ApiFailureTest` & `ServerHelloApplicationTests` need:
+
+1. **MySQL running**, with the `demodb` database and the `demoapp` user (see *Setting up MySQL*).
+2. **The `reset.sql` data.** The tests expect exact match: **mina owns reservation 1, room 1 has reservations, and the accounts are mina, omar and admin.**
+3. **An `.env` file** in the project root with `DB_PASSWORD`, `JWT_SECRET` and `CORS_ORIGINS` (see `.env.example`).
+
+Each API test is `@Transactional` and rolled back, so running the tests does not change the data.
+`ReservationServiceTest` does not use Spring or the database, so it needs no ceremony.
+
+### Running
+
+From the project root:
+
+### Windows
+
+```ps1
+.\gradlew.bat test
+```
+
+### Linux
+
+```bash
+./gradlew test
+```
+
+All tests must pass. Report is stored at `build/reports/tests/test/index.html`.
+
+Latest compiled report can be found [HERE](src/test/java/com/dongseo/server_hello/test_report.html)
+
+
 ## Dependencies
 
 ---
@@ -158,7 +199,7 @@ The select loads the existing room by id (findById), and the update then writes 
 
 ### Windows
 
-```bash
+```ps1
 .\gradlew.bat bootRun
 ```
 
@@ -177,7 +218,7 @@ Build the .jar:
 
 ### Windows
 
-```bash
+```ps1
 .\gradlew.bat bootJar
 ```
 
@@ -191,7 +232,7 @@ Run the .jar:
 
 ### Windows
 
-```bash
+```ps1
 java -jar build\libs\server-hello-2.0.jar
 ```
 

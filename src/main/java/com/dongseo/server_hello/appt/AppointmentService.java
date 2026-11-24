@@ -56,8 +56,16 @@ public class AppointmentService {
         return a;
     }
 
+    // 400: checked before anything is loaded
+    private static void requireStartBeforeEnd(LocalDateTime start, LocalDateTime end) {
+        if (!start.isBefore(end))
+            throw new IllegalArgumentException("startTime must be before endTime");
+    }
+
     @Transactional
     public Appointment create(Long demoId, String username, LocalDateTime startTime, LocalDateTime endTime) {
+        requireStartBeforeEnd(startTime, endTime);
+
         AppUser owner = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("user " + username + " not found"));
 
@@ -73,6 +81,8 @@ public class AppointmentService {
 
     @Transactional
     public Appointment reschedule(Long id, String username, LocalDateTime start, LocalDateTime end) {
+        requireStartBeforeEnd(start, end);
+
         Appointment a = findById(id);
         if (!a.isOwnedBy(username))
             throw new ForbiddenException("reservation " + id + " belongs to another user");
