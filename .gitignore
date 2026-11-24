@@ -25,3 +25,6 @@ gradle-app.setting
 build/
 .gradle/
 *.iml
+
+# Secrets
+.env
